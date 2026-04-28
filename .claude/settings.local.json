@@ -1,7 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx create-next-app@latest *)"
+      "Bash(npx create-next-app@latest *)",
+      "Bash(git -C /Users/danreeves/Desktop/Projects/harvey-specter status)",
+      "Bash(git -C /Users/danreeves/Desktop/Projects/harvey-specter log --oneline)",
+      "Bash(git -C /Users/danreeves/Desktop/Projects/harvey-specter add src/app/page.tsx)",
+      "Bash(git -C /Users/danreeves/Desktop/Projects/harvey-specter commit -m ' *)",
+      "Bash(gh repo *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(git -C /Users/danreeves/Desktop/Projects/harvey-specter add src/app/page.tsx src/app/components/GeometricBackground.tsx)",
+      "Bash(git -C /Users/danreeves/Desktop/Projects/harvey-specter push)"
     ]
   }
 }
