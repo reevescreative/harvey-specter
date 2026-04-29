@@ -17,14 +17,14 @@ export default function HeroSection() {
         src={HERO_PHOTO}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover object-top pointer-events-none select-none"
+        className="absolute inset-0 w-full h-full object-cover object-center md:object-[center_15%] scale-[1.15] origin-top pointer-events-none select-none"
       />
 
-      {/* Bottom blur overlay — softens the photo behind the text block */}
-      <div className="absolute bottom-0 left-0 right-0 h-[349px] backdrop-blur-[10px] bg-[rgba(217,217,217,0.01)]" />
+      {/* Bottom blur overlay — fades in upward via mask gradient */}
+      <div className="absolute bottom-0 left-0 right-0 h-[349px] backdrop-blur-[10px] bg-[rgba(217,217,217,0.01)] [mask-image:linear-gradient(to_bottom,transparent,black_50%)]" />
 
       {/* Page layout */}
-      <div className="relative h-full flex flex-col px-4 md:px-8 pb-6 md:pb-0 justify-between md:justify-start md:gap-[240px]">
+      <div className="relative h-full flex flex-col px-6 md:px-8 pb-8 md:pb-0 justify-between md:justify-start md:gap-[240px]">
 
         {/* ── Navbar ── */}
         <nav className="flex items-center justify-between py-6 shrink-0">
@@ -57,13 +57,42 @@ export default function HeroSection() {
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
           >
-            <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <line x1="0" y1="1" x2="24" y2="1" stroke="black" strokeWidth="2" strokeLinecap="round" />
-              <line x1="0" y1="9" x2="24" y2="9" stroke="black" strokeWidth="2" strokeLinecap="round" />
-              <line x1="0" y1="17" x2="24" y2="17" stroke="black" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            {menuOpen ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="4" y1="4" x2="20" y2="20" stroke="black" strokeWidth="2" strokeLinecap="round" />
+                <line x1="20" y1="4" x2="4" y2="20" stroke="black" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="0" y1="1" x2="24" y2="1" stroke="black" strokeWidth="2" strokeLinecap="round" />
+                <line x1="0" y1="9" x2="24" y2="9" stroke="black" strokeWidth="2" strokeLinecap="round" />
+                <line x1="0" y1="17" x2="24" y2="17" stroke="black" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            )}
           </button>
         </nav>
+
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div className="md:hidden absolute top-[72px] left-0 right-0 bg-white/90 backdrop-blur-md flex flex-col px-4 py-6 gap-5 z-50">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link}
+                href={`#${link.toLowerCase()}`}
+                className="pl-2 font-semibold text-base tracking-[-0.04em] capitalize text-black hover:opacity-60 transition-opacity"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link}
+              </a>
+            ))}
+            <button
+              className="mt-2 self-start bg-black text-white text-sm font-medium tracking-[-0.04em] px-4 py-3 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => setMenuOpen(false)}
+            >
+              Let&apos;s talk
+            </button>
+          </div>
+        )}
 
         {/* ── Hero text ── */}
         {/* Mobile: fixed 341px block, justify-between pushes label+name up, desc+cta down */}
@@ -83,12 +112,12 @@ export default function HeroSection() {
             <h1
               className="
                 font-medium text-white mix-blend-overlay capitalize text-center w-full
-                text-[96px] md:text-[198px]
-                tracking-[-6.72px] md:tracking-[-13.86px]
+                whitespace-pre-wrap md:whitespace-nowrap
+                text-[96px] md:text-[13.75vw]
+                tracking-[-0.07em]
                 leading-[0.8] md:leading-[1.1]
                 mb-[-15px]
               "
-              style={{ whiteSpace: 'pre-wrap' }}
             >
               {'Harvey   Specter'}
             </h1>
@@ -96,7 +125,7 @@ export default function HeroSection() {
 
           {/* Description + CTA */}
           <div className="flex w-full justify-start md:justify-end">
-            <div className="flex flex-col gap-[17px] items-start w-[293px] md:w-[294px]">
+            <div className="flex flex-col gap-[17px] items-start w-full md:w-[294px]">
               <p className="font-bold italic text-[14px] text-[#1f1f1f] tracking-[-0.035em] uppercase leading-[1.1]">
                 <span>H.Studio is a </span>
                 <span className="font-normal not-italic">full-service</span>
