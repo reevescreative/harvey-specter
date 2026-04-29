@@ -1,42 +1,33 @@
-// Figma MCP assets — expire 7 days from 2026-04-28; replace with permanent hosted images
-const IMAGES = {
-  surfers:   'https://www.figma.com/api/mcp/asset/f8ae6307-2336-4c59-a9a8-c8f493212955',
-  cyberpunk: 'https://www.figma.com/api/mcp/asset/3ed450d6-02d5-48b1-bcf4-d14caeb0e544',
-  agency:    'https://www.figma.com/api/mcp/asset/398826c0-141f-440d-b868-7d14a61bf920',
-  minimal:   'https://www.figma.com/api/mcp/asset/3a69a430-4212-42a4-884c-2f5e876b9734',
+import { defineQuery } from 'next-sanity'
+import { sanityFetch } from '@/sanity/lib/live'
+import { urlFor } from '@/sanity/lib/image'
+
+const portfolioQuery = defineQuery(`
+  *[_type == "portfolioItem" && featured == true] | order(displayOrder asc) [0...4] {
+    _id,
+    title,
+    tags,
+    coverImage { ..., asset-> },
+    projectUrl,
+    displayOrder
+  }
+`)
+
+type PortfolioItem = {
+  _id: string
+  title: string
+  tags: string[] | null
+  coverImage: { asset: object; alt?: string } | null
+  projectUrl: string | null
+  displayOrder: number | null
 }
 
-const PROJECTS = [
-  // Left column (desktop)
-  {
-    title: 'Surfers Paradise',
-    tags: ['Social Media', 'Photography'],
-    image: IMAGES.surfers,
-    heightClass: 'h-[390px] md:h-[744px]',
-    col: 'left' as const,
-  },
-  {
-    title: 'Cyberpunk Caffe',
-    tags: ['Social Media', 'Photography'],
-    image: IMAGES.cyberpunk,
-    heightClass: 'h-[390px] md:h-[699px]',
-    col: 'left' as const,
-  },
-  // Right column (desktop)
-  {
-    title: 'Agency 976',
-    tags: ['Social Media', 'Photography'],
-    image: IMAGES.agency,
-    heightClass: 'h-[390px] md:h-[699px]',
-    col: 'right' as const,
-  },
-  {
-    title: 'Minimal Playground',
-    tags: ['Social Media', 'Photography'],
-    image: IMAGES.minimal,
-    heightClass: 'h-[390px] md:h-[744px]',
-    col: 'right' as const,
-  },
+// Heights alternate per column position to match the original staggered design
+const HEIGHT_CLASSES = [
+  'h-[390px] md:h-[744px]', // left col, top
+  'h-[390px] md:h-[699px]', // left col, bottom
+  'h-[390px] md:h-[699px]', // right col, top
+  'h-[390px] md:h-[744px]', // right col, bottom
 ]
 
 function Tag({ label }: { label: string }) {
@@ -63,28 +54,51 @@ function CornerBracket({ className }: { className?: string }) {
   )
 }
 
-function ProjectCard({ title, tags, image, heightClass }: typeof PROJECTS[number]) {
+function ProjectCard({ item, index }: { item: PortfolioItem; index: number }) {
+  const heightClass = HEIGHT_CLASSES[index] ?? 'h-[390px] md:h-[699px]'
+  const imageUrl = item.coverImage?.asset
+    ? urlFor(item.coverImage).width(800).url()
+    : null
+
   return (
     <div className="flex flex-col gap-[10px] w-full">
-      <div className={`relative ${heightClass} w-full overflow-hidden`}>
-        <img
-          src={image}
-          alt={title}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute bottom-4 left-4 flex gap-3">
-          {tags.map((tag) => (
-            <Tag key={tag} label={tag} />
-          ))}
-        </div>
+      <div className={`relative ${heightClass} w-full overflow-hidden bg-neutral-200`}>
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={item.coverImage?.alt ?? item.title}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-neutral-300 to-neutral-400" />
+        )}
+        {item.tags && item.tags.length > 0 && (
+          <div className="absolute bottom-4 left-4 flex gap-3">
+            {item.tags.map((tag) => (
+              <Tag key={tag} label={tag} />
+            ))}
+          </div>
+        )}
       </div>
       <div className="flex items-center justify-between w-full">
         <p className="font-black text-[24px] md:text-[36px] text-black tracking-[-0.04em] leading-[1.1] uppercase whitespace-nowrap">
-          {title}
+          {item.title}
         </p>
-        <button className="shrink-0 size-8 flex items-center justify-center" aria-label={`View ${title}`}>
-          <ArrowNE />
-        </button>
+        {item.projectUrl ? (
+          <a
+            href={item.projectUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 size-8 flex items-center justify-center"
+            aria-label={`View ${item.title}`}
+          >
+            <ArrowNE />
+          </a>
+        ) : (
+          <button className="shrink-0 size-8 flex items-center justify-center" aria-label={`View ${item.title}`}>
+            <ArrowNE />
+          </button>
+        )}
       </div>
     </div>
   )
@@ -113,23 +127,21 @@ function CtaBox() {
   )
 }
 
-export default function PortfolioSection() {
-  const leftProjects = PROJECTS.filter((p) => p.col === 'left')
-  const rightProjects = PROJECTS.filter((p) => p.col === 'right')
+export default async function PortfolioSection() {
+  const { data: items } = await sanityFetch({ query: portfolioQuery }) as { data: PortfolioItem[] }
+
+  const leftItems = items.slice(0, 2)
+  const rightItems = items.slice(2, 4)
 
   return (
     <section id="projects" className="px-4 md:px-8 py-12 md:py-20 w-full bg-white">
 
       {/* Header */}
       <div className="flex items-start justify-between w-full mb-8 md:mb-[61px]">
-
-        {/* Left: label (mobile only) + title + counter */}
         <div className="flex flex-col gap-4 md:gap-0 w-full md:w-auto">
-          {/* [ portfolio ] — mobile only, horizontal above title */}
           <p className="md:hidden font-mono text-[14px] text-[#1f1f1f] uppercase leading-[1.1]">
             [ portfolio ]
           </p>
-          {/* Title + 004 */}
           <div className="flex items-start gap-[10px]">
             <div className="font-light text-[32px] md:text-[6.5vw] text-black tracking-[-0.08em] leading-[0.86] uppercase">
               <p>Selected</p>
@@ -140,8 +152,6 @@ export default function PortfolioSection() {
             </p>
           </div>
         </div>
-
-        {/* [ portfolio ] — desktop only, vertical on far right */}
         <div className="hidden md:flex h-[110px] w-4 items-center justify-center shrink-0 overflow-visible">
           <p className="font-mono text-[14px] text-[#1f1f1f] uppercase leading-[1.1] whitespace-nowrap -rotate-90">
             [ portfolio ]
@@ -154,10 +164,9 @@ export default function PortfolioSection() {
 
         {/* Left column */}
         <div className="flex flex-col gap-6 flex-1 min-w-0">
-          {leftProjects.map((p) => (
-            <ProjectCard key={p.title} {...p} />
+          {leftItems.map((item, i) => (
+            <ProjectCard key={item._id} item={item} index={i} />
           ))}
-          {/* CTA box — desktop position: bottom of left col */}
           <div className="hidden md:block">
             <CtaBox />
           </div>
@@ -165,8 +174,8 @@ export default function PortfolioSection() {
 
         {/* Right column — offset 240px down on desktop */}
         <div className="flex flex-col gap-6 flex-1 min-w-0 md:pt-[240px]">
-          {rightProjects.map((p) => (
-            <ProjectCard key={p.title} {...p} />
+          {rightItems.map((item, i) => (
+            <ProjectCard key={item._id} item={item} index={i + 2} />
           ))}
         </div>
 
