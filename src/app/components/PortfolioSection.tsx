@@ -128,7 +128,7 @@ function CtaBox() {
 }
 
 export default async function PortfolioSection() {
-  const { data: items } = await sanityFetch({ query: portfolioQuery })
+  const { data: items } = await sanityFetch({ query: portfolioQuery }) as { data: PortfolioItem[] }
 
   const leftItems = items.slice(0, 2)
   const rightItems = items.slice(2, 4)
