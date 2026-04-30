@@ -1,3 +1,4 @@
+import Navbar from './components/Navbar'
 import HeroSection from './components/HeroSection'
 import AboutSection from './components/AboutSection'
 import AboutSection2 from './components/AboutSection2'
@@ -11,7 +12,8 @@ import Footer from './components/Footer'
 export default function Home() {
   return (
     <>
-      <main>
+      <Navbar />
+      <main className="relative z-10">
         <HeroSection />
         <AboutSection />
         <AboutSection2 />

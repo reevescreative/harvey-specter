@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono, Playfair_Display } from "next/font/google";
 import { SanityLive } from "@/sanity/lib/live";
+import ContactModalProvider from "./components/ContactModal";
 import "./globals.css";
 
 const inter = Inter({
@@ -35,7 +36,9 @@ export default function RootLayout({
       className={`${inter.variable} ${geistMono.variable} ${playfairDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <ContactModalProvider>
+          {children}
+        </ContactModalProvider>
         <SanityLive />
       </body>
     </html>

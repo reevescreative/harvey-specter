@@ -3,7 +3,7 @@ const PHOTO = 'https://www.figma.com/api/mcp/asset/00e66769-c007-447a-8ff0-3f3cb
 
 export default function FullBleedPhoto() {
   return (
-    <section className="w-full h-[56vw] max-h-[800px] min-h-[320px] relative overflow-hidden">
+    <section data-nav="dark" className="w-full h-[90vw] md:h-[56vw] md:max-h-[800px] relative overflow-hidden">
       <img
         src={PHOTO}
         alt="Photographer holding a Nikon camera at golden hour"

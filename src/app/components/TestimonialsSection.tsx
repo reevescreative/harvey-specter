@@ -1,3 +1,7 @@
+'use client'
+
+import { useRef, useState, useCallback } from 'react'
+
 const TESTIMONIALS = [
   {
     quote:
@@ -41,11 +45,11 @@ function Stars() {
   )
 }
 
-function Card({ quote, author, rotation }: { quote: string; author: string; rotation: string }) {
+function Card({ quote, author, rotation, flat = false }: { quote: string; author: string; rotation: string; flat?: boolean }) {
   return (
     <div
-      className="bg-[#f1f1f1] border border-[#ddd] rounded-[4px] p-6 flex flex-col gap-4 w-[353px] shrink-0"
-      style={{ transform: `rotate(${rotation})` }}
+      className={`bg-[#f1f1f1] border border-[#ddd] rounded-[4px] p-6 flex flex-col gap-4 ${flat ? 'w-full' : 'w-[353px] shrink-0'}`}
+      style={flat ? undefined : { transform: `rotate(${rotation})` }}
     >
       <Stars />
       <p className="text-[#1f1f1f] text-[18px] leading-[1.3] tracking-[-0.04em]">
@@ -59,13 +63,35 @@ function Card({ quote, author, rotation }: { quote: string; author: string; rota
 }
 
 export default function TestimonialsSection() {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const firstCard = el.children[0] as HTMLElement
+    if (!firstCard) return
+    const cardWidth = firstCard.offsetWidth + 16
+    const index = Math.round(el.scrollLeft / cardWidth)
+    setActiveIndex(Math.min(Math.max(index, 0), TESTIMONIALS.length - 1))
+  }, [])
+
+  const scrollTo = useCallback((i: number) => {
+    const el = scrollRef.current
+    if (!el) return
+    const firstCard = el.children[0] as HTMLElement
+    if (!firstCard) return
+    el.scrollTo({ left: i * (firstCard.offsetWidth + 16), behavior: 'smooth' })
+    setActiveIndex(i)
+  }, [])
+
   return (
-    <section className="w-full bg-white overflow-hidden">
+    <section className="w-full bg-white">
 
       {/* ── Desktop: scattered cards floating around giant title ── */}
-      <div className="hidden md:block relative min-h-[960px] px-8 py-[120px]">
+      <div className="hidden md:flex items-center relative min-h-[960px] px-8 overflow-hidden">
         <p
-          className="font-medium text-black text-center capitalize leading-[1.1] select-none relative z-10"
+          className="w-full font-medium text-black text-center capitalize leading-[1.1] select-none relative z-10"
           style={{ fontSize: 'clamp(80px, 13.75vw, 198px)', letterSpacing: '-0.07em' }}
         >
           Testimonials
@@ -82,8 +108,8 @@ export default function TestimonialsSection() {
         ))}
       </div>
 
-      {/* ── Mobile: title above, horizontal scroll of cards ── */}
-      <div className="md:hidden flex flex-col gap-8 px-4 py-16">
+      {/* ── Mobile: title above, swipeable slider ── */}
+      <div className="md:hidden flex flex-col gap-8 py-16 px-6">
         <p
           className="font-medium text-black capitalize leading-[0.8]"
           style={{ fontSize: '64px', letterSpacing: '-0.07em' }}
@@ -91,11 +117,31 @@ export default function TestimonialsSection() {
           Testimonials
         </p>
 
-        <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-none">
-          {TESTIMONIALS.map((t) => (
-            <div key={t.author} className="snap-start">
-              <Card quote={t.quote} author={t.author} rotation={t.rotation} />
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 -mx-6"
+          style={{ scrollPaddingLeft: '1.5rem' }}
+        >
+          {TESTIMONIALS.map((t, i) => (
+            <div
+              key={t.author}
+              className={`snap-start shrink-0 w-[calc(100vw-4rem)] ${i === 0 ? 'ml-6' : ''} ${i === TESTIMONIALS.length - 1 ? 'mr-10' : ''}`}
+            >
+              <Card quote={t.quote} author={t.author} rotation={t.rotation} flat />
             </div>
+          ))}
+        </div>
+
+        {/* Dot indicators */}
+        <div className="flex justify-center gap-2">
+          {TESTIMONIALS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => scrollTo(i)}
+              aria-label={`Go to testimonial ${i + 1}`}
+              className={`w-2 h-2 rounded-full transition-colors duration-200 ${i === activeIndex ? 'bg-black' : 'bg-neutral-300'}`}
+            />
           ))}
         </div>
       </div>

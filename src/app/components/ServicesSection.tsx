@@ -44,7 +44,7 @@ const SERVICES = [
 
 export default function ServicesSection() {
   return (
-    <section id="services" className="bg-black px-4 md:px-8 py-12 md:py-20 flex flex-col gap-8 md:gap-12 w-full">
+    <section id="services" data-nav="dark" className="bg-black px-4 md:px-8 py-12 md:py-20 flex flex-col gap-8 md:gap-12 w-full">
 
       {/* Label */}
       <p className="font-mono text-[14px] text-white uppercase leading-[1.1] whitespace-nowrap">

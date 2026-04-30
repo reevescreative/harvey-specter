@@ -64,9 +64,9 @@ export default function NewsSection() {
         <p className="font-light text-black uppercase leading-[0.86] tracking-[-0.08em] text-[32px]">
           Keep up with my latest news &amp; achievements
         </p>
-        <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pb-4 snap-x snap-mandatory scrollbar-none">
+        <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-none">
           {POSTS.map((post, i) => (
-            <div key={i} className="snap-start shrink-0 w-[300px]">
+            <div key={i} className={`snap-start shrink-0 w-[300px] ${i === POSTS.length - 1 ? 'mr-12' : ''}`}>
               <NewsCard {...post} />
             </div>
           ))}

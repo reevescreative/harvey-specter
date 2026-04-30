@@ -1,3 +1,7 @@
+'use client'
+
+import { useContactModal } from './ContactModal'
+
 const SOCIAL_LINKS = [
   { label: 'Facebook',  href: '#' },
   { label: 'Instagram', href: '#' },
@@ -6,8 +10,9 @@ const SOCIAL_LINKS = [
 ]
 
 export default function Footer() {
+  const { openModal } = useContactModal()
   return (
-    <footer className="bg-black w-full pt-12 px-4 md:px-8">
+    <footer className="sticky bottom-0 bg-black w-full pt-12 px-4 md:px-8">
 
       {/* ── Top: CTA + social links ── */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 md:gap-0 pb-10 md:pb-12">
@@ -19,7 +24,7 @@ export default function Footer() {
             <strong className="font-black not-italic">project</strong>
             {' '}in mind?
           </p>
-          <button className="self-start border border-white text-white text-[14px] font-medium tracking-[-0.04em] px-4 py-3 rounded-full hover:bg-white hover:text-black transition-colors">
+          <button onClick={openModal} className="self-start border border-white text-white text-[14px] font-medium tracking-[-0.04em] px-4 py-3 rounded-full hover:bg-white hover:text-black transition-colors">
             Let&apos;s talk
           </button>
         </div>
@@ -61,10 +66,10 @@ export default function Footer() {
       {/* ── Bottom: wordmark + legal links ── */}
 
       {/* Desktop bottom */}
-      <div className="hidden md:flex items-end justify-between mt-[120px]">
+      <div className="hidden md:flex items-end justify-between mt-[120px] pb-8">
 
-        {/* H.Studio — giant wordmark, vertically cropped */}
-        <div className="relative flex-1 overflow-hidden flex items-end" style={{ height: '219px' }}>
+        {/* H.Studio — giant wordmark */}
+        <div className="relative flex-1 flex items-end">
           {/* [ CODED BY CLAUDE ] — vertical label on far left */}
           <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-4 h-40 overflow-visible z-10">
             <p className="font-mono text-white text-[14px] uppercase leading-[1.1] whitespace-nowrap -rotate-90">
